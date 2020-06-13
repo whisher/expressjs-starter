@@ -8,7 +8,7 @@ const path = require("path");
 
 const indexRouter = require("./src/routes/index");
 const apiRouter = require("./src/routes/api");
-const apiResponse = require("./src/helpers/apiResponse");
+const apiResponse = require("./src/helpers/api-response.helper");
 
 // DB connection
 const isProd = process.env.NODE_ENV === "production";
@@ -17,7 +17,7 @@ require("./src/db/connect")(isProd);
 const app = express();
 
 if (process.env.NODE_ENV !== "test") {
-	app.use(logger("dev"));
+  app.use(logger("dev"));
 }
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -35,13 +35,13 @@ app.use("/api/", apiRouter);
 
 // throw 404 if URL not found
 app.all("*", function (_, res) {
-	return apiResponse.notFoundResponse(res, "Page not found");
+  return apiResponse.notFoundResponse(res, "Page not found");
 });
 
 app.use((err, _, res) => {
-	if (err.name == "UnauthorizedError") {
-		return apiResponse.unauthorizedResponse(res, err.message);
-	}
+  if (err.name == "UnauthorizedError") {
+    return apiResponse.unauthorizedResponse(res, err.message);
+  }
 });
 
 module.exports = app;

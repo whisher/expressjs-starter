@@ -1,7 +1,7 @@
-const UserModel = require("../models/UserModel");
+const UserModel = require("../models/user.model");
 const { validationResult } = require("express-validator");
 //helper file to prepare responses.
-const apiResponse = require("../helpers/apiResponse");
+const apiResponse = require("../helpers/api-response.helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -88,8 +88,8 @@ exports.login = (req, res) => {
               };
               const secret = process.env.JWT_SECRET;
               //Generated JWT token with Payload and secret.
-              userData.token = jwt.sign(jwtPayload, secret, jwtData);
-              return apiResponse.successResponseWithData(res, userData);
+              const token = jwt.sign(jwtPayload, secret, jwtData);
+              return apiResponse.successResponseWithData(res, token);
             } else {
               return apiResponse.unauthorizedResponse(
                 res,
