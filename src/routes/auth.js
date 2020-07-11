@@ -4,8 +4,8 @@ const AuthValidator = require("../validators/auth.validator");
 const router = express.Router();
 const auth = require("../middlewares/jwt");
 
+router.get("/account", auth, AuthController.account);
 router.post("/login", AuthValidator.login, AuthController.login);
-router.get("/me", auth, AuthController.me);
 router.post("/signup", AuthValidator.signup, AuthController.signup);
 
 module.exports = router;

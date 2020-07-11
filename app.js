@@ -27,7 +27,7 @@ app.use(cors());
 
 // heroku to get https protocol
 app.enable("trust proxy");
-app.use("/assets", express.static(path.join("assets")));
+app.use(express.static(path.join(__dirname, "static")));
 
 //Route Prefixes
 app.use("/", indexRouter);

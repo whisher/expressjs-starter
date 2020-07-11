@@ -1,19 +1,48 @@
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema;
+const mongodbErrorHandler = require("mongoose-mongodb-errors");
 
-var UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true },
+    about: {
+      type: String,
+      trim: true,
+    },
+    avatar: {
+      type: String,
+      required: "Avatar image is required",
+      default: "/static/images/profile-image.jpg",
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      required: true,
+    },
     password: { type: String, required: true },
     status: { type: Boolean, required: true, default: true },
+    username: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      required: true,
+    },
+    following: [{ type: ObjectId, ref: "User" }],
+    followers: [{ type: ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );
 
-// Virtual for user's full name
-UserSchema.virtual("fullName").get(() => {
-  return this.firstName + " " + this.lastName;
-});
+const autoPopulateFollowingAndFollowers = function (next) {
+  this.populate("following", "_id username avatar");
+  this.populate("followers", "_id username avatar");
+  next();
+};
 
-module.exports = mongoose.model("User", UserSchema);
+userSchema.pre("findOne", autoPopulateFollowingAndFollowers);
+
+userSchema.plugin(mongodbErrorHandler);
+
+module.exports = mongoose.model("User", userSchema);

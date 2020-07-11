@@ -5,43 +5,28 @@ const apiResponse = require("../helpers/api-response.helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-/**
- * User registration.
- *
- * @param {string}      firstName
- * @param {string}      lastName
- * @param {string}      email
- * @param {string}      password
- *
- * @returns {Object}
- */
 exports.signup = (req, res) => {
   try {
-    // Extract the validation errors from a request.
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // Display sanitized values/errors messages.
       return apiResponse.validationErrorWithData(res, errors.array());
     }
-    //hash input password
-    bcrypt.hash(req.body.password, 10, function (err, hash) {
-      // Create User object with escaped and trimmed data
-      var user = new UserModel({
-        firstName: req.body.firstname,
-        lastName: req.body.lastname,
+
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
+      const user = new UserModel({
+        username: req.body.username,
         email: req.body.email,
         password: hash,
       });
 
       // Save user.
-      user.save(function (err) {
+      user.save((err) => {
         if (err) {
           return apiResponse.ErrorResponse(res, err);
         }
-        let userData = {
+        const userData = {
           _id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          username: user.username,
           email: user.email,
         };
         return apiResponse.successResponseWithData(res, userData);
@@ -52,15 +37,6 @@ exports.signup = (req, res) => {
     return apiResponse.ErrorResponse(res, err);
   }
 };
-
-/**
- * User login.
- *
- * @param {string}      email
- * @param {string}      password
- *
- * @returns {Object}
- */
 
 exports.login = (req, res) => {
   try {
@@ -77,8 +53,8 @@ exports.login = (req, res) => {
             if (user.status) {
               let userData = {
                 _id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
+                avatar: user.avatar,
+                username: user.username,
                 email: user.email,
               };
               //Prepare JWT token for authentication
@@ -115,6 +91,6 @@ exports.login = (req, res) => {
   }
 };
 
-exports.me = (req, res) => {
+exports.account = (req, res) => {
   res.status(200).json(req.user);
 };
